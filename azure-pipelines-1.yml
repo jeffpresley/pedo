@@ -4,19 +4,44 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/java
 
 trigger:
-- main
+- main  # Triggers the pipeline on commits to the main branch.
 
-pool: ronaldo
-  
+pool:
+  name: ronaldo
+  demands:
+    - maven  # Ensures Maven is installed on the agent.
 
 steps:
-- task: Maven@4
+# Validate Agent Version
+- script: |
+    echo "Validating agent version..."
+    if [ "$(echo $AGENT_VERSION | awk -F. '{print ($1*1000000+$2*1000+$3)}')" -lt "$(echo 2.163.1 | awk -F. '{print ($1*1000000+$2*1000+$3)}')" ]; then
+      echo "Agent version must be greater than 2.163.1. Current version: $AGENT_VERSION"
+      exit 1
+    fi
+  displayName: 'Validate Agent Version'
+
+# Checkout the code from the repository
+- task: Checkout@1
+  displayName: 'Checkout Code'
+
+# Build the project using Maven
+- task: Maven@3
+  displayName: 'Build and Package with Maven'
   inputs:
-    mavenPomFile: 'pom.xml'
-    mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.11'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
-    testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    goals: 'package'
+    mavenPomFile: 'pom.xml'  # Path to the Maven POM file.
+    mavenOptions: '-Xmx3072m'  # JVM options for Maven.
+    javaHomeOption: 'JDKVersion'  # Use JDK installed on the agent.
+    jdkVersionOption: '1.11'  # Specify JDK version (Java 11).
+    jdkArchitectureOption: 'x64'  # Specify JDK architecture (64-bit).
+    publishJUnitResults: true  # Publish JUnit test results.
+    testResultsFiles: '**/surefire-reports/TEST-*.xml'  # Path to test results.
+    goals: 'package'  # Maven goal to execute.
+
+# Publish the build artifacts (optional)
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Build Artifacts'
+  inputs:
+    pathToPublish: 'target'  # Directory to publish (e.g., Maven output folder).
+    artifactName: 'drop'  # Name of the artifact.
+    publishLocation: 'Container'
