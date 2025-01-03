@@ -6,10 +6,11 @@
 trigger:
 - main  # Triggers the pipeline on commits to the main branch.
 
+# Using Microsoft-hosted agent to simplify debugging
 pool:
-  name: ronaldo  # Use the ronaldo agent pool
+  vmImage: 'ubuntu-latest'  # Use the latest Ubuntu-based hosted agent for simplicity.
   demands:
-    - maven  # Ensure Maven is installed on the agent
+    - maven  # Ensure Maven is available on the agent.
 
 steps:
 # Debug: Output all environment variables to check available variables
