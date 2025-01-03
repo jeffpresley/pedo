@@ -6,7 +6,11 @@
 trigger:
 - main
 
-pool: aigent
+pool: 
+ name: aigent
+ demands:
+    - maven
+    - Agent.Version -gtVersion 2.163.1
 
 steps:
 - task: Maven@4
