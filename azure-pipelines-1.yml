@@ -12,13 +12,14 @@ pool:
     - maven  # Ensures Maven is installed on the agent.
 
 steps:
-# Validate Agent Version
-- script: |
-    echo "Validating agent version..."
-    if [ "$(echo $AGENT_VERSION | awk -F. '{print ($1*1000000+$2*1000+$3)}')" -lt "$(echo 2.163.1 | awk -F. '{print ($1*1000000+$2*1000+$3)}')" ]; then
-      echo "Agent version must be greater than 2.163.1. Current version: $AGENT_VERSION"
-      exit 1
-    fi
+# Validate Agent Version using PowerShell
+- powershell: |
+    $agentVersion = $(Agent.Version)
+    $requiredVersion = "2.163.1"
+    if ([version]$agentVersion -lt [version]$requiredVersion) {
+        Write-Host "Agent version must be greater than 2.163.1. Current version: $agentVersion"
+        exit 1
+    }
   displayName: 'Validate Agent Version'
 
 # Checkout the code from the repository
