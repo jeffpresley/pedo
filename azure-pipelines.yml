@@ -6,16 +6,20 @@
 trigger:
 - main
 
-pool: aigent
+pool:
+  name: aigent
+  demands:
+    - maven
+    - Agent.Version -gtVersion 2.163.1
 
 steps:
 - task: Maven@4
   inputs:
-    mavenPomFile: 'pom.xml'
-    mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.11'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
+    mavenPomFile: 'pom.xml'                 # Ensure 'pom.xml' is in the repository's root directory
+    mavenOptions: '-Xmx3072m'              # JVM memory options for Maven
+    javaHomeOption: 'JDKVersion'           # Use a specific JDK version
+    jdkVersionOption: '11'                 # Updated for compatibility; '1.11' should be '11'
+    jdkArchitectureOption: 'x64'           # Specify architecture
+    publishJUnitResults: true              # Publish JUnit test results
     testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    goals: 'package'
+    goals: 'clean package'                 # Added 'clean' to ensure a fresh build
