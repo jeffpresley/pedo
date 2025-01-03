@@ -4,42 +4,21 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/java
 
 trigger:
-- main  # Triggers the pipeline on commits to the main branch.
+- main
 
-# Using Microsoft-hosted agent to simplify debugging
-pool:
-  vmImage: 'ubuntu-latest'  # Use the latest Ubuntu-based hosted agent for simplicity.
-  demands:
-    - maven  # Ensure Maven is available on the agent.
+# Use a Microsoft-hosted agent for simplicity (if your pool isn't configured properly)
+# If you want to continue with 'ronaldo', you can keep it as is
+pool: 
+  name: ronaldo  # Keep using the 'ronaldo' pool if it's working fine with Maven
 
 steps:
-# Debug: Output all environment variables to check available variables
-- script: |
-    echo "Available Environment Variables:"
-    printenv
-  displayName: 'Debug: Output Environment Variables'
-
-# Checkout the code from the repository
-- task: Checkout@1
-  displayName: 'Checkout Code'
-
-# Build the project using Maven
-- task: Maven@3
-  displayName: 'Build and Package with Maven'
+- task: Maven@4
   inputs:
-    mavenPomFile: 'pom.xml'  # Path to the Maven POM file.
-    mavenOptions: '-Xmx3072m'  # JVM options for Maven.
-    javaHomeOption: 'JDKVersion'  # Use JDK installed on the agent.
-    jdkVersionOption: '1.11'  # Specify JDK version (Java 11).
-    jdkArchitectureOption: 'x64'  # Specify JDK architecture (64-bit).
-    publishJUnitResults: true  # Publish JUnit test results.
-    testResultsFiles: '**/surefire-reports/TEST-*.xml'  # Path to test results.
-    goals: 'package'  # Maven goal to execute.
-
-# Publish the build artifacts (optional)
-- task: PublishBuildArtifacts@1
-  displayName: 'Publish Build Artifacts'
-  inputs:
-    pathToPublish: 'target'  # Directory to publish (e.g., Maven output folder).
-    artifactName: 'drop'  # Name of the artifact.
-    publishLocation: 'Container'
+    mavenPomFile: 'pom.xml'  # Ensure the path to the pom.xml is correct
+    mavenOptions: '-Xmx3072m'  # Adjust memory for Maven build if needed
+    javaHomeOption: 'JDKVersion'  # Use JDK installed on the agent
+    jdkVersionOption: '1.11'  # Set JDK version to 1.11 (ensure this is available in your agent)
+    jdkArchitectureOption: 'x64'  # Ensure 64-bit architecture
+    publishJUnitResults: true  # Enable publishing of JUnit test results
+    testResultsFiles: '**/surefire-reports/TEST-*.xml'  # Correct path to test results
+    goals: 'package'  # Default Maven goal for building the project
