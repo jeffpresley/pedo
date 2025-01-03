@@ -12,9 +12,15 @@ pool:
     - maven  # Ensures Maven is installed on the agent.
 
 steps:
+# Debug: Output all environment variables to check available variables.
+- script: |
+    echo "Available Environment Variables:"
+    printenv
+  displayName: 'Debug: Output Environment Variables'
+
 # Validate Agent Version using PowerShell
 - powershell: |
-    $agentVersion = $(Agent.Version)
+    $agentVersion = "$(Agent.Version)"
     $requiredVersion = "2.163.1"
     if ([version]$agentVersion -lt [version]$requiredVersion) {
         Write-Host "Agent version must be greater than 2.163.1. Current version: $agentVersion"
